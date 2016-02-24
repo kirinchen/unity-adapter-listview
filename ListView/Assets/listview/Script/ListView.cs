@@ -11,6 +11,7 @@ public class ListView : MonoBehaviour {
     private BaseAdapter adapter;
     private List<ItemBundle> items = new List<ItemBundle>();
     private int firstPos, lastPos;
+    private Dictionary<int, Vector3> scaleMap = new Dictionary<int, Vector3>();
 
     void Awake() {
         firstPos = 0;
@@ -52,6 +53,7 @@ public class ListView : MonoBehaviour {
 
     private void initItemTrans(RectTransform trans) {
         trans.parent = rectTram;
+        trans.localPosition = Vector3.zero;
         trans.pivot = new Vector2(0.5f, 1);
         trans.anchorMax = new Vector2(0.5f, 1);
         trans.anchorMin = new Vector2(0.5f, 1);
@@ -143,7 +145,8 @@ public class ListView : MonoBehaviour {
     }
 
     private void enable(GameObject go, bool b) {
-        go.SetActive(b);
+        Vector3 v = b ? new Vector3(1,1,1) : Vector3.zero;
+        go.transform.localScale = v;
     }
 
     private void checkRecycle(ItemBundle ib) {
