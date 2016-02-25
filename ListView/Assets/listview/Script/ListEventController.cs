@@ -89,7 +89,7 @@ public class ListEventController : MonoBehaviour {
     }
 
     private void plusY(float d) {
-        Vector3 v3= listView.transform.worldToLocalMatrix.MultiplyPoint(new Vector3(0,d,0));
+        Vector3 v3 = listView.transform.worldToLocalMatrix.MultiplyVector(new Vector3(0,d,0));
         listView.plusY(v3.y);
     }
 

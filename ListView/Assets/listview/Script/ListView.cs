@@ -11,7 +11,6 @@ public class ListView : MonoBehaviour {
     private BaseAdapter adapter;
     private List<ItemBundle> items = new List<ItemBundle>();
     private int firstPos, lastPos;
-    private Dictionary<int, Vector3> scaleMap = new Dictionary<int, Vector3>();
 
     void Awake() {
         firstPos = 0;
@@ -32,6 +31,7 @@ public class ListView : MonoBehaviour {
             items.Add(ib);
             eventController.injectItemEvent(ib.trans.gameObject);
         }
+        forEachByItems(refleshFastOne);
     }
 
     private ItemBundle getCurrentFeedItem() {
@@ -130,23 +130,53 @@ public class ListView : MonoBehaviour {
         return d > 0 && (lastPos + 1) >= adapter.getCount() && y > -rectTram.rect.height;
     }
 
-    private void reflesh() {
+    internal void reflesh() {
         forEachByItems(refleshOne);
+    }
+
+    private void refleshFastOne(ItemBundle ib) {
+        RectTransform rtf = adapter.getView(ib.trans, ib.position);
+        ib.trans = rtf;
+        if (ib.trans.anchoredPosition.y > 0 || ib.getBottomCenter().y < -rectTram.rect.height * 1.1f) {
+            enableFast(ib, false);
+        } else {
+            enableFast(ib, true);
+        }
     }
 
     private void refleshOne(ItemBundle ib) {
         RectTransform rtf = adapter.getView(ib.trans, ib.position);
         ib.trans = rtf;
         if (ib.trans.anchoredPosition.y > 0 || ib.getBottomCenter().y < -rectTram.rect.height * 1.1f) {
-            enable(rtf.gameObject, false);
+            enable(ib, false);
         } else {
-            enable(rtf.gameObject, true);
+            enable(ib, true);
         }
     }
 
-    private void enable(GameObject go, bool b) {
+    private void enableFast(ItemBundle ib, bool b) {
         Vector3 v = b ? new Vector3(1,1,1) : Vector3.zero;
-        go.transform.localScale = v;
+        ib.trans.localScale = v;
+        ib.enableStatus = b ? ItemBundle.EnableStatus.Enabled : ItemBundle.EnableStatus.Disabled;
+    }
+
+    private void enable(ItemBundle ib, bool b) {
+        ib.enableStatus = b ? ItemBundle.EnableStatus.Enabling: ItemBundle.EnableStatus.Disabling;
+        StartCoroutine(runEnable(ib));
+    }
+
+    private IEnumerator runEnable(ItemBundle ib) {
+        while (ib.isScaling()) {
+            Vector3 toV = ib.getScaleTo();
+            float d = Vector3.Distance(toV,ib.getCurrentScale());
+            if (d < 0.005f) {
+                ib.setScaleFinshStatus();
+            } else {
+                Vector3 shiftV = (toV - ib.getCurrentScale()) * 0.035f;
+                ib.trans.localScale += shiftV;
+            }
+            yield return new WaitForSeconds(0.01f);
+        }
     }
 
     private void checkRecycle(ItemBundle ib) {
