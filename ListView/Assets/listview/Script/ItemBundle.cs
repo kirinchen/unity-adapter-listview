@@ -10,7 +10,13 @@ public class ItemBundle {
 
     public RectTransform trans;
     public int position;
-    public EnableStatus enableStatus = EnableStatus.Enabled;
+    public EnableStatus enableStatus {
+        get; internal set;
+    }
+
+    public ItemBundle() {
+        enableStatus = EnableStatus.Enabled;
+    }
 
     public Vector2 getBottomCenter() {
         float y =  trans.anchoredPosition.y - trans.rect.height;

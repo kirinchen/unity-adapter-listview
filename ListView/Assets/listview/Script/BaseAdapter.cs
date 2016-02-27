@@ -12,10 +12,12 @@ public abstract class BaseAdapter : MonoBehaviour {
 
     public abstract int getCount();
 
-    public abstract RectTransform getView(RectTransform currentView,int position);
+    public abstract RectTransform getView(RectTransform currentView, int position);
 
     public void notifydatachanged() {
-        view.reflesh();
+        if (view != null) {
+            view.initViews();
+        }
     }
 
 }

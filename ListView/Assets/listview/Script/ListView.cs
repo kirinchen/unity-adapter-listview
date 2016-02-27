@@ -11,6 +11,8 @@ public class ListView : MonoBehaviour {
     private BaseAdapter adapter;
     private List<ItemBundle> items = new List<ItemBundle>();
     private int firstPos, lastPos;
+    public Action<ItemBundle> onLockTop = (ItemBundle ib) => { };
+    public Action<ItemBundle> onLockBottom = (ItemBundle ib) => { };
 
     void Awake() {
         firstPos = 0;
@@ -19,12 +21,25 @@ public class ListView : MonoBehaviour {
     }
 
     public void setAdapter(BaseAdapter ba) {
+        removeAllItems();
         adapter = ba;
         adapter.setListView(this);
         initViews();
     }
 
-    private void initViews() {
+    private void removeAllItems() {
+        Action<ItemBundle> iba = (ItemBundle ib) => {
+            Destroy(ib.trans.gameObject);
+        };
+        forEachByItems(iba);
+        items.Clear();
+    }
+
+    internal List<ItemBundle> getItems() {
+        return items;
+    }
+
+    internal void initViews() {
         ItemBundle ib = null;
         while ((ib = getCurrentFeedItem()) != null) {
             ib.trans.anchoredPosition = new Vector3(ib.trans.anchoredPosition.x, -getCurrentItemsHeight(), 0);
@@ -33,6 +48,8 @@ public class ListView : MonoBehaviour {
         }
         forEachByItems(refleshFastOne);
     }
+
+
 
     private ItemBundle getCurrentFeedItem() {
         int i = items.Count;
@@ -61,7 +78,14 @@ public class ListView : MonoBehaviour {
     }
 
     internal void plusY(float d) {
-        if (lockMoveToBottom(d) || lockMoveToTop(d)) {
+        if (adapter.getCount() <= 0) {
+            return;
+        }
+        if (lockMoveToBottom(d) ) {
+            onLockTop(getByPosition(firstPos));
+            return;
+        } else if (lockMoveToTop(d)) {
+            onLockBottom(getByPosition(lastPos));
             return;
         }
         if (d > 0) {
