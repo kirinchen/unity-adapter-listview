@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameManager : MonoBehaviour {
+public class GameManager1 : MonoBehaviour {
 
     private ListView listView;
     private ExampleAdapter adapter;

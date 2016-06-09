@@ -47,11 +47,12 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\listview\ExampleAdapter.cs" />
-     <Compile Include="Assets\listview\GameManager.cs" />
+     <Compile Include="Assets\listview\GameManager1.cs" />
      <Compile Include="Assets\listview\Script\BaseAdapter.cs" />
      <Compile Include="Assets\listview\Script\ItemBundle.cs" />
      <Compile Include="Assets\listview\Script\ListEventController.cs" />
      <Compile Include="Assets\listview\Script\ListView.cs" />
+     <Compile Include="Assets\listview\Script\ListViewUtils.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity514/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

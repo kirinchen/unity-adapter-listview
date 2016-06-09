@@ -9,6 +9,7 @@ public class ListView : MonoBehaviour {
     private ListEventController eventController;
     private RectTransform rectTram;
     private BaseAdapter adapter;
+    private ListViewUtils utils;
     private List<ItemBundle> items = new List<ItemBundle>();
     private int firstPos, lastPos;
     public Action<ItemBundle> onLockTop = (ItemBundle ib) => { };
@@ -18,9 +19,11 @@ public class ListView : MonoBehaviour {
         firstPos = 0;
         eventController = GetComponent<ListEventController>();
         rectTram = GetComponent<RectTransform>();
+        utils = gameObject.AddComponent<ListViewUtils>();
     }
 
     public void setAdapter(BaseAdapter ba) {
+        firstPos = lastPos = 0;
         removeAllItems();
         adapter = ba;
         adapter.setListView(this);
@@ -42,7 +45,7 @@ public class ListView : MonoBehaviour {
     internal void initViews() {
         ItemBundle ib = null;
         while ((ib = getCurrentFeedItem()) != null) {
-            ib.trans.anchoredPosition = new Vector3(ib.trans.anchoredPosition.x, -getCurrentItemsHeight(), 0);
+            ib.trans.anchoredPosition = new Vector3(ib.trans.anchoredPosition.x, -getContentHeight(), 0);
             items.Add(ib);
             eventController.injectItemEvent(ib.trans.gameObject);
         }
@@ -53,7 +56,7 @@ public class ListView : MonoBehaviour {
 
     private ItemBundle getCurrentFeedItem() {
         int i = items.Count;
-        bool heightB = (rectTram.rect.height * ITEM_BUFFER_HEIGHT_SCALE) > getCurrentItemsHeight();
+        bool heightB = (getContainerHeight() * ITEM_BUFFER_HEIGHT_SCALE) > getContentHeight();
         bool countB = i < adapter.getCount();
         if (heightB && countB) {
             ItemBundle ans = new ItemBundle();
@@ -150,57 +153,17 @@ public class ListView : MonoBehaviour {
         float y = lastB.getBottomCenter().y;
         bool db = d > 0;
         bool indexB = lastPos >= adapter.getCount();
-        bool heightB = y > -rectTram.rect.height;
-        return d > 0 && (lastPos + 1) >= adapter.getCount() && y > -rectTram.rect.height;
+        bool heightB = y > -getContainerHeight();
+        return d > 0 && (lastPos + 1) >= adapter.getCount() && y > -getContainerHeight();
     }
 
     internal void reflesh() {
-        forEachByItems(refleshOne);
+        forEachByItems(refleshFastOne);
     }
 
     private void refleshFastOne(ItemBundle ib) {
         RectTransform rtf = adapter.getView(ib.trans, ib.position);
         ib.trans = rtf;
-        if (ib.trans.anchoredPosition.y > 0 || ib.getBottomCenter().y < -rectTram.rect.height * 1.1f) {
-            enableFast(ib, false);
-        } else {
-            enableFast(ib, true);
-        }
-    }
-
-    private void refleshOne(ItemBundle ib) {
-        RectTransform rtf = adapter.getView(ib.trans, ib.position);
-        ib.trans = rtf;
-        if (ib.trans.anchoredPosition.y > 0 || ib.getBottomCenter().y < -rectTram.rect.height * 1.1f) {
-            enable(ib, false);
-        } else {
-            enable(ib, true);
-        }
-    }
-
-    private void enableFast(ItemBundle ib, bool b) {
-        Vector3 v = b ? new Vector3(1,1,1) : Vector3.zero;
-        ib.trans.localScale = v;
-        ib.enableStatus = b ? ItemBundle.EnableStatus.Enabled : ItemBundle.EnableStatus.Disabled;
-    }
-
-    private void enable(ItemBundle ib, bool b) {
-        ib.enableStatus = b ? ItemBundle.EnableStatus.Enabling: ItemBundle.EnableStatus.Disabling;
-        StartCoroutine(runEnable(ib));
-    }
-
-    private IEnumerator runEnable(ItemBundle ib) {
-        while (ib.isScaling()) {
-            Vector3 toV = ib.getScaleTo();
-            float d = Vector3.Distance(toV,ib.getCurrentScale());
-            if (d < 0.005f) {
-                ib.setScaleFinshStatus();
-            } else {
-                Vector3 shiftV = (toV - ib.getCurrentScale()) * 0.035f;
-                ib.trans.localScale += shiftV;
-            }
-            yield return new WaitForSeconds(0.01f);
-        }
     }
 
     private void checkRecycle(ItemBundle ib) {
@@ -219,21 +182,21 @@ public class ListView : MonoBehaviour {
 
 
     private float getTopLimtY() {
-        float ans = getCurrentItemsHeight() - rectTram.rect.height;
+        float ans = getContentHeight() - getContainerHeight();
         return ans / 2;
     }
 
     private float getBottomLimtY() {
-        float ans = getCurrentItemsHeight() - rectTram.rect.height;
+        float ans = getContentHeight() - getContainerHeight();
         ans /= 2;
-        return -rectTram.rect.height - ans;
+        return -getContainerHeight() - ans;
     }
 
     private void forEachByItems(Action<ItemBundle> iba) {
         items.ForEach(iba);
     }
 
-    private float getCurrentItemsHeight() {
+    private float getContentHeight() {
         float ans = 0f;
         foreach (ItemBundle ib in items) {
             ans += ib.trans.rect.height;
@@ -245,7 +208,9 @@ public class ListView : MonoBehaviour {
         return items.Find((ItemBundle ib) => { return ib.position == pos; });
     }
 
-
+    private float getContainerHeight() {
+        return rectTram.rect.height;
+    }
 
 
 }

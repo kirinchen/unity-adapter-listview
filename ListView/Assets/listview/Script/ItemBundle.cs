@@ -46,6 +46,10 @@ public class ItemBundle {
         }
     }
 
+    public Vector2 getAnchoredPosition() {
+        return trans.anchoredPosition;
+    }
+
     public Vector3 getCurrentScale() {
         return trans.localScale;
     }
