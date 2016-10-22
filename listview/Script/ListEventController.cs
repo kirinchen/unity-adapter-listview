@@ -3,13 +3,15 @@ using System.Collections;
 using System;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class ListEventController : MonoBehaviour {
 
     private ListView listView;
     private float startTime;
     private bool _down;
-    public bool draged {
+    public bool draged
+    {
         get; private set;
     }
     private float lastY;
@@ -27,10 +29,10 @@ public class ListEventController : MonoBehaviour {
         addEventTrigger(eventTrigger, onMouseMove, EventTriggerType.Drag);
     }
 
-    private void addEventTrigger(EventTrigger eventTrigger, UnityAction action, EventTriggerType triggerType) {
+    private void addEventTrigger(EventTrigger eventTrigger, UnityAction<BaseEventData> action, EventTriggerType triggerType) {
         // Create a nee TriggerEvent and add a listener
         EventTrigger.TriggerEvent trigger = new EventTrigger.TriggerEvent();
-        trigger.AddListener((eventData) => action()); // you can capture and pass the event data to the listener
+        trigger.AddListener(action); // you can capture and pass the event data to the listener
 
         // Create and initialise EventTrigger.Entry using the created TriggerEvent
         EventTrigger.Entry entry = new EventTrigger.Entry() { callback = trigger, eventID = triggerType };
@@ -39,31 +41,35 @@ public class ListEventController : MonoBehaviour {
         eventTrigger.triggers.Add(entry);
     }
 
-    public void onMouseDown() {
+    public void onMouseDown(BaseEventData ed) {
         _down = true;
-        Vector3 v = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        PointerEventData pd = (PointerEventData)ed;
+        Vector3 v = pd.position;
         lastY = v.y;
         startY = lastY;
         startTime = Time.time;
     }
 
-    public void onMouseMove() {
 
+
+    public void onMouseMove(BaseEventData ed) {
         if (_down) {
-            
+            PointerEventData pd = (PointerEventData)ed;
+
             draged = true;
-            Vector3 v = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            
+            Vector3 v = pd.position;
+
             float d = v.y - lastY;
             plusY(d);
             lastY = v.y;
         }
     }
 
-    public void onMouseUp() {
+    public void onMouseUp(BaseEventData ed) {
+        PointerEventData pd = (PointerEventData)ed;
         _down = false;
         draged = false;
-        setupInertia(Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+        setupInertia(pd.position.y);
         fixBundle();
     }
 
@@ -89,11 +95,12 @@ public class ListEventController : MonoBehaviour {
     }
 
     private void plusY(float d) {
-        Vector3 v3 = listView.transform.worldToLocalMatrix.MultiplyVector(new Vector3(0,d,0));
+        Vector3 v3 = new Vector3(0, d, 0);
         listView.plusY(v3.y);
     }
 
     internal void injectItemEvent(GameObject go) {
         injectEvets(go);
     }
+
 }
