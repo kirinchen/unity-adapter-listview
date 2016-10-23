@@ -24,7 +24,6 @@ public class ExampleAdapter : BaseAdapter {
         if (currentView == null) {
             currentView = Instantiate(prefab);
         }
-
         Text text = currentView.GetComponent<Text>();
         text.text = textList[position];
         return currentView;
