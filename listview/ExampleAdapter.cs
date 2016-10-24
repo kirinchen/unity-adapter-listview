@@ -10,10 +10,22 @@ public class ExampleAdapter : BaseAdapter {
     private List<string> textList = new List<string>();
 
     void Awake() {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 5; i++) {
             textList.Add("AA_" + i);
         }
 
+    }
+
+    public void minus() {
+        if (textList.Count > 0) {
+            textList.RemoveAt(0);
+        }
+        notifydatachanged();
+    }
+
+    public void plus() {
+        textList.Add("PLUS="+Time.time);
+        notifydatachanged();
     }
 
     public override int getCount() {

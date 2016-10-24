@@ -84,7 +84,7 @@ public class ListView : MonoBehaviour {
         if (adapter.getCount() <= 0) {
             return;
         }
-        if (lockMoveToBottom(d) ) {
+        if (lockMoveToBottom(d)) {
             onLockTop(getByPosition(firstPos));
             return;
         } else if (lockMoveToTop(d)) {
@@ -96,7 +96,7 @@ public class ListView : MonoBehaviour {
         } else {
             shiftDown(d);
         }
-         reflesh();
+        reflesh();
     }
 
     private void shiftUp(float d) {
@@ -105,7 +105,7 @@ public class ListView : MonoBehaviour {
             ItemBundle ib = getByPosition(i);
             if (beforeB == null) {
                 Vector2 v = ib.trans.anchoredPosition + new Vector2(0, d);
-                if ((lastPos+1)<adapter.getCount() && v.y > getTopLimtY() ) {
+                if ((lastPos + 1) < adapter.getCount() && v.y > getTopLimtY()) {
                     firstPos++;
                     ib.position = ++lastPos;
                 } else {
@@ -122,7 +122,7 @@ public class ListView : MonoBehaviour {
             ItemBundle nextB = getByPosition(i + 1);
             ItemBundle ib = getByPosition(i);
             if (nextB == null) {
-                if ((firstPos ) > 0 && ib.getBottomCenter().y < getBottomLimtY()) {
+                if ((firstPos) > 0 && ib.getBottomCenter().y < getBottomLimtY()) {
                     lastPos--;
                     ib.position = --firstPos;
                 } else {
@@ -162,8 +162,17 @@ public class ListView : MonoBehaviour {
     }
 
     private void refleshFastOne(ItemBundle ib) {
-        RectTransform rtf = adapter.getView(ib.trans, ib.position);
-        ib.trans = rtf;
+        if (ib.position < adapter.getCount()) {
+            if (!ib.trans.gameObject.activeSelf) {
+                ib.trans.gameObject.SetActive(true);
+            }
+            RectTransform rtf = adapter.getView(ib.trans, ib.position);
+            ib.trans = rtf;
+        } else {
+            if (ib.trans.gameObject.activeSelf) {
+                ib.trans.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void checkRecycle(ItemBundle ib) {
