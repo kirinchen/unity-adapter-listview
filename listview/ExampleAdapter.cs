@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using surfm.listview;
 
 public class ExampleAdapter : BaseAdapter {
 
@@ -24,7 +25,7 @@ public class ExampleAdapter : BaseAdapter {
     }
 
     public void plus() {
-        textList.Add("PLUS="+Time.time);
+        textList.Add("PLUS=" + Time.time);
         notifydatachanged();
     }
 
@@ -37,7 +38,7 @@ public class ExampleAdapter : BaseAdapter {
             currentView = Instantiate(prefab);
         }
         Text text = currentView.GetComponent<Text>();
-        text.text = textList[position];
+        text.text = textList[position] + " pos=" + position;
         return currentView;
     }
 }
