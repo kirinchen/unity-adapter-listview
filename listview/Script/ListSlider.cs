@@ -45,6 +45,8 @@ namespace surfm.listview {
 
         private void onMouseUp(BaseEventData arg0) {
             onValueChanged();
+            list.plusY(getTotalH()/10, false);
+            list.plusY(-getTotalH()/10, false);
             _onMouseDown = false;
         }
 
@@ -71,16 +73,27 @@ namespace surfm.listview {
 
         private float getListRate() {
             List<ItemBundle> ibs = list.listVisble();
-            float fp = ibs.Count > 0 ? ibs[0].position : 0;
-            float allCount = list.adapter.getCount() - ibs.Count;
-            return allCount <= 0 ? 0 : fp / allCount;
+            if (ibs.Count <= 0) {
+                return 0;
+            }
+            return ibs[0].getRealY() <= 0 ? 0 : ibs[0].getRealY() / getTotalH();
         }
 
-        public void onValueChanged() {
+        private float getTotalH() {
+            return list.getTotalHeight() - list.getContainerHeight();
+        }
+
+        public void onSlideValueChanged() {
+            Debug.Log("onSlideValueChanged");
+            onValueChanged();
+        }
+
+        private void onValueChanged() {
             if (_onMouseDown) {
-                float totalH = list.getTotalHeight() - list.getContainerHeight();
+                float totalH = getTotalH();
                 float vRate = slider.value / valueRange;
-                float dR = vRate - getListRate();
+                float cR = getListRate();
+                float dR = vRate - cR;
                 if (Mathf.Abs(dR) > 0.07f) {
                     float dh = dR * totalH;
                     list.plusY(dh, false);

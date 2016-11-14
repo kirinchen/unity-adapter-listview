@@ -29,5 +29,9 @@ namespace surfm.listview {
         internal float getHeight() {
             return trans.rect.height;
         }
+
+        public float getRealY() {
+            return trans.anchoredPosition.y + position * trans.rect.height;
+        }
     }
 }

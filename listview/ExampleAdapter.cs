@@ -9,6 +9,8 @@ public class ExampleAdapter : BaseAdapter {
 
     public RectTransform prefab;
     private List<string> textList = new List<string>();
+    public int plusCount = 1;
+
 
     void Awake() {
         for (int i = 0; i < 5; i++) {
@@ -18,14 +20,20 @@ public class ExampleAdapter : BaseAdapter {
     }
 
     public void minus() {
-        if (textList.Count > 0) {
-            textList.RemoveAt(0);
+        for (int i = 0; i < plusCount; i++) {
+
+            if (textList.Count > 0) {
+                textList.RemoveAt(0);
+            }
         }
         notifydatachanged();
     }
 
     public void plus() {
-        textList.Add("PLUS=" + Time.time);
+        for (int i = 0; i < plusCount; i++) {
+
+            textList.Add("PLUS=" + Time.time);
+        }
         notifydatachanged();
     }
 

@@ -84,7 +84,7 @@ namespace surfm.listview {
             trans.localScale = new Vector3(1, 1, 1);
         }
 
-        internal void plusY(float d , bool trigger = true) {
+        internal void plusY(float d, bool trigger = true) {
             if (isScollble()) {
                 if (adapter.getCount() <= 0) {
                     return;
@@ -102,7 +102,7 @@ namespace surfm.listview {
                     shiftDown(d);
                 }
                 reflesh();
-                if(trigger) onViewPlused();
+                if (trigger) onViewPlused();
             }
         }
 
@@ -251,11 +251,12 @@ namespace surfm.listview {
         }
 
         public float getTotalHeight() {
-            return ListViewUtils.getLength(items,adapter.getCount());
+            if (adapter.getCount() <= 0) return 0;
+            return ListViewUtils.getLength(items, adapter.getCount() - 1);
         }
 
         public List<ItemBundle> listVisble() {
-            return ListViewUtils.listVisble(items,-getContainerHeight());
+            return ListViewUtils.listVisble(items, -getContainerHeight());
         }
 
     }
