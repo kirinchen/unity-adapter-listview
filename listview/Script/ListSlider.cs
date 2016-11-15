@@ -9,7 +9,6 @@ using UnityEngine.Events;
 namespace surfm.listview {
     [RequireComponent(typeof(Slider))]
     public class ListSlider : MonoBehaviour {
-
         private Slider slider;
         public ListView list;
         private float valueRange;
@@ -27,6 +26,7 @@ namespace surfm.listview {
         }
 
         private void onReflesh() {
+            stopMoveTask();
             if (list.isScollble()) {
                 gameObject.SetActive(true);
                 syncSliderValue();
@@ -45,8 +45,6 @@ namespace surfm.listview {
 
         private void onMouseUp(BaseEventData arg0) {
             onValueChanged();
-            list.plusY(getTotalH()/10, false);
-            list.plusY(-getTotalH()/10, false);
             _onMouseDown = false;
         }
 
@@ -84,20 +82,58 @@ namespace surfm.listview {
         }
 
         public void onSlideValueChanged() {
-            Debug.Log("onSlideValueChanged");
             onValueChanged();
         }
 
+
+
         private void onValueChanged() {
             if (_onMouseDown) {
-                float totalH = getTotalH();
                 float vRate = slider.value / valueRange;
                 float cR = getListRate();
                 float dR = vRate - cR;
-                if (Mathf.Abs(dR) > 0.07f) {
-                    float dh = dR * totalH;
-                    list.plusY(dh, false);
+                if (Mathf.Abs(dR) > 0.025f) {
+                    plus(dR);
                 }
+            }
+        }
+        private IEnumerator currentMoveTask = null;
+        private void plusSmooth(float dH) {
+            stopMoveTask();
+            currentMoveTask = plusSmoothTask(dH);
+            StartCoroutine(currentMoveTask);
+        }
+
+        private void stopMoveTask() {
+            if (currentMoveTask != null) {
+                StopCoroutine(currentMoveTask);
+            }
+        }
+
+        private IEnumerator plusSmoothTask(float dH) {
+            float lastDh = dH;
+            while (Mathf.Abs(lastDh) > 0) {
+                float mh = 0;
+                if (Mathf.Abs(lastDh) <= list.getContainerHeight()) {
+                    mh = lastDh;
+                } else {
+                    mh = dH > 0 ? list.getContainerHeight() : -list.getContainerHeight();
+                }
+                float orgLDH = lastDh;
+                lastDh = lastDh - mh;
+                list.plusY(mh, false);
+                //Debug.Log("lastDh="+ lastDh+ " orgLDH="+ orgLDH+ " mh="+ mh);
+                yield return 0;
+            }
+        }
+
+        private void plus(float dR) {
+            float totalH = getTotalH();
+            float dh = dR * totalH;
+            if (Mathf.Abs(dh) > list.getContainerHeight()) {
+                plusSmooth(dh);
+            } else {
+                list.plusY(dh, false);
             }
         }
     }

@@ -27,6 +27,13 @@ namespace surfm.listview {
             addEventTrigger(eventTrigger, onMouseDown, EventTriggerType.PointerDown);
             addEventTrigger(eventTrigger, onMouseUp, EventTriggerType.PointerUp);
             addEventTrigger(eventTrigger, onMouseMove, EventTriggerType.Drag);
+            addEventTrigger(eventTrigger, onScroll, EventTriggerType.Scroll);
+        }
+
+        private void onScroll(BaseEventData ed) {
+            PointerEventData pd = (PointerEventData)ed;
+            float mh = pd.scrollDelta.normalized.y * listView.getContainerHeight() * 0.2f;
+            plusY(mh);
         }
 
         private void addEventTrigger(EventTrigger eventTrigger, UnityAction<BaseEventData> action, EventTriggerType triggerType) {
