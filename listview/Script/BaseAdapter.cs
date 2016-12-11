@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace surfm.listview {
     public abstract class BaseAdapter : MonoBehaviour {
