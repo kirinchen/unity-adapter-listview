@@ -243,6 +243,7 @@ namespace surfm.listview {
         private void fixedTop() {
             if (isEnded()) {
                 ItemBundle ib = getByPosition(0);
+                if (ib == null) return;
                 float y = ib.trans.anchoredPosition.y;
                 if (y != 0) {
                     plusY(-y);
