@@ -36,7 +36,7 @@ namespace surfm.listview {
             plusY(mh);
         }
 
-        private void addEventTrigger(EventTrigger eventTrigger, UnityAction<BaseEventData> action, EventTriggerType triggerType) {
+        public static void addEventTrigger(EventTrigger eventTrigger, UnityAction<BaseEventData> action, EventTriggerType triggerType) {
             // Create a nee TriggerEvent and add a listener
             EventTrigger.TriggerEvent trigger = new EventTrigger.TriggerEvent();
             trigger.AddListener(action); // you can capture and pass the event data to the listener
